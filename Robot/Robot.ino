@@ -7,13 +7,11 @@
 #include <TM1637Display.h>
 #include <TMC2209.h>
 
-void setup_2209(TMC2209 stepper_driver);
-
 #define LED 13
 
 // Define the pins for TM1637 module
-#define CLK_PIN 23
-#define DIO_PIN 22
+#define TM1637_CLK_PIN 23
+#define TM1637_DIO_PIN 22
 
 #define MAIN_DRIVERS_SERIAL Serial1
 #define CLAMP_DRIVER_SERIAL Serial2
@@ -23,6 +21,7 @@ void setup_2209(TMC2209 stepper_driver);
 #define CLAMP_DRIVER_EN_PIN 55 // A1
 #define CLAMP_DRIVER_DIAG_PIN 56 // A2
 
+/* Not used
 #define MAIN_DRIVER_1_STEP_PIN 9
 #define MAIN_DRIVER_1_DIR_PIN 8
 #define MAIN_DRIVER_2_STEP_PIN 5
@@ -33,19 +32,20 @@ void setup_2209(TMC2209 stepper_driver);
 #define MAIN_DRIVER_4_DIR_PIN 2
 #define CLAMP_DRIVER_STEP_PIN 13
 #define CLAMP_DRIVER_DIR_PIN 12
-
-// Stepper configuration
-#define R_SENSE 0.11f     // Sense resistor value
+*/
 
 Remote myRemote(9600, 10);
 
-HardwareSerial & serial1_stream = MAIN_DRIVERS_SERIAL;
-HardwareSerial & serial2_stream = MAIN_DRIVERS_SERIAL;
+HardwareSerial & main_drivers_sstream = MAIN_DRIVERS_SERIAL;
+HardwareSerial & clamp_driver_sstream = CLAMP_DRIVER_SERIAL;
 
-TMC2209 main_drivers;
+TMC2209 main_driver_1;
+TMC2209 main_driver_2;
+TMC2209 main_driver_3;
+TMC2209 main_driver_4;
 TMC2209 clamp_driver;
 
-TM1637Display display(CLK_PIN, DIO_PIN);
+TM1637Display display(TM1637_CLK_PIN, TM1637_DIO_PIN);
 
 Servo servo1;
 Servo servo2;
@@ -61,15 +61,23 @@ float moteurB;
 float moteurC;
 float moteurD;
 
+void config_2209(TMC2209 stepper_driver);
+
 void setup() {
   delay(1000);
 
-  Serial.begin(9600); //Computer communication
+  //Serial.begin(9600); //Computer communication
 
-  main_drivers.setup(serial1_stream, 115200, TMC2209::SERIAL_ADDRESS_0);
-  clamp_driver.setup(serial2_stream, 115200, TMC2209::SERIAL_ADDRESS_0);
-  setup_2209(main_drivers);
-  setup_2209(clamp_driver);
+  main_driver_1.setup(main_drivers_sstream, 115200, TMC2209::SERIAL_ADDRESS_0); 
+  main_driver_2.setup(main_drivers_sstream, 115200, TMC2209::SERIAL_ADDRESS_1);
+  main_driver_3.setup(main_drivers_sstream, 115200, TMC2209::SERIAL_ADDRESS_2);
+  main_driver_4.setup(main_drivers_sstream, 115200, TMC2209::SERIAL_ADDRESS_3);
+  clamp_driver.setup(clamp_driver_sstream, 115200, TMC2209::SERIAL_ADDRESS_0);
+  config_2209(main_driver_1);
+  config_2209(main_driver_2);
+  config_2209(main_driver_3);
+  config_2209(main_driver_4);
+  config_2209(clamp_driver);
 
   pinMode(LED, OUTPUT);
 
@@ -82,12 +90,13 @@ void setup() {
   
   display.setBrightness(5); // Set the brightness level (0 to 7)
 
-  servo1.attach(68);
-  servo2.attach(67);
-  servo3.attach(66);
-  servo4.attach(65);
-  servo5.attach(64);
+  servo1.attach(68); //68
+  servo2.attach(67); //67
+  servo3.attach(66); //66
+  servo4.attach(65); //65
+  servo5.attach(64); //64
 
+  // Give time to the remote to start
   delay(1000);
 }
 
@@ -107,7 +116,10 @@ void loop() {
   // driver2 = moteurB
   // driver3 = moteurC
   // driver4 = moteurA
-  main_drivers.moveAtVelocity((int32_t)(moteurA * 900));
+  main_driver_1.moveAtVelocity((int32_t)(moteurD * 900)); // Derriere Droit
+  main_driver_2.moveAtVelocity((int32_t)(moteurB * 900)); // Avant Droit
+  main_driver_3.moveAtVelocity((int32_t)(moteurC * 900)); // Derriere Gauche
+  main_driver_4.moveAtVelocity((int32_t)(moteurA * 900)); // Avant Gauche
 /*
   Serial.print("Joystick1_Y: ");
   Serial.println(myRemote.Joystick1_Y);
@@ -125,7 +137,7 @@ void loop() {
   delayMicroseconds(400);
 }
 
-void setup_2209(TMC2209 stepper_driver){
+void config_2209(TMC2209 stepper_driver){
   //stepper_driver.setRMSCurrent(1000, R_SENSE);
   stepper_driver.setRunCurrent(100);
   stepper_driver.useInternalSenseResistors();
