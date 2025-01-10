@@ -4,13 +4,13 @@ Programmation du robot principal de la CDFR 2025 de l'équipe Bidulab.
 Vous trouverez les programmes Remote et Robot ainsi que des tests, pour être compilés pour Arduino Nano et Mega.
 
 Programme testé avec Arduino IDE 2.2.1
-### Dépendances
-#### Remote
+
+## Dépendances
+### Remote
 - Aucune dépendance
-#### Robot
+### Robot
 - TM1637 by Avishay Orpaz
 https://github.com/avishorp/TM1637
-
 - TMC2209 by Peter Polidoro
 https://github.com/janelia-arduino/TMC2209
 
@@ -74,3 +74,36 @@ Le programme Arduino envoie des données uniquement lorsqu’il reçoit une comm
 ### Indicateur LED
 - La LED clignote (200 ms éteinte, 150 ms allumée) si aucune commande valide (`0x41`) n'est reçue pendant plus de 200 ms.
 - La LED reste allumée lorsque les messages valides sont reçus régulièrement.
+
+
+# Programme Robot
+
+## Description
+
+Ce programme contrôle le robot équipé de moteurs pas à pas, servo-moteurs et un écran TM1637. Le robot est piloté à l'aide de la télécommande.
+
+---
+
+## Fonctionnalités principales
+
+### 1. **Contrôle des moteurs pas à pas**
+- Les vitesses des moteurs principaux sont calculées en fonction :
+  - **De la vitesse linéaire** (amplitude du joystick 1).
+  - **De la direction** (angle du joystick 1).
+  - **De la rotation** (joystick 2).
+
+### 2. **Lecture des commandes de la télécommande**
+- **Joysticks** :
+  - `Joystick 1` : contrôle la direction et la vitesse.
+  - `Joystick 2` : contrôle la rotation (pivot sur place).
+- **Boutons** :
+  - `Button1` : Monter la pince.
+  - `Button2` : Descendre la pince.
+  - `Button3` : Ouvrir la pince.
+  - `Button4` : Fermer la pince.
+
+### 3. **Affichage sur TM1637**
+- L'écran affiche le compte des points par l'encodeur rotatif.
+
+### 4. **Servo-moteurs**
+- Le programme contrôle **2 servo-moteurs**, qui sont utilisés pour les estrades.
