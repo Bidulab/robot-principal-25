@@ -120,6 +120,14 @@ void loop() {
   main_driver_2.moveAtVelocity((int32_t)(moteurB * 900)); // Avant Droit
   main_driver_3.moveAtVelocity((int32_t)(moteurC * 900)); // Derriere Gauche
   main_driver_4.moveAtVelocity((int32_t)(moteurA * 900)); // Avant Gauche
+
+  if (myRemote.Button1){
+    clamp_driver.moveAtVelocity(200000);
+  } else if (myRemote.Button2){
+    clamp_driver.moveAtVelocity(-200000);
+  } else {
+    clamp_driver.moveAtVelocity(0);
+  }
 /*
   Serial.print("Joystick1_Y: ");
   Serial.println(myRemote.Joystick1_Y);
