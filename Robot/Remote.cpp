@@ -2,30 +2,30 @@
 #include "Arduino.h"
 #include "Remote.h"
 
-#define SERIAL Serial3
+#define REMOTE_SERIAL Serial3
 
 Remote::Remote(unsigned long baud, short int initCounter)
 {
-  SERIAL.begin(baud);
+  REMOTE_SERIAL.begin(baud);
   counter = initCounter;
 }
 
-void Remote::updateValues()
+// Returns true if valid
+bool Remote::updateValues()
 {
-  SERIAL.write('A');                               // Send get message
+  REMOTE_SERIAL.flush();      // Clear incomming message
+  REMOTE_SERIAL.write('A');                               // Send get message
   unsigned short i = 0;
-  while(SERIAL.available() < 13){
+  while(REMOTE_SERIAL.available() < 13){
     i++;
     delayMicroseconds(50);
-    if (i == 2000){                                  // If delay > 100 ms
-      i = 0;
-      while(SERIAL.available()){ SERIAL.read(); } // Clear incomming message because it might be corrupted
-      SERIAL.write('A');                           // Resend get message
+    if (i == 400){                                  // If delay > 20 ms
+      return false;
     }
   }
 
   // read the incoming bytes
-  SERIAL.readBytes(Mymessage, 13);
+  REMOTE_SERIAL.readBytes(Mymessage, 13);
 
   Joystick1_X = Mymessage[1];
   Joystick1_X = -2 * Joystick1_X + 255;
@@ -47,5 +47,7 @@ void Remote::updateValues()
   
   counter += (signed char)Mymessage[11];
   
-  SERIAL.flush();
+  REMOTE_SERIAL.flush();
+
+  return true;
 }

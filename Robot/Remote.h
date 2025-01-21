@@ -30,7 +30,7 @@ class Remote
 
 		Remote(unsigned long baud, short int initCounter);
 
-		void updateValues();
+		bool updateValues();
 		
 	private:
     unsigned char Mymessage[13]; //Initialized variable to store recieved data  

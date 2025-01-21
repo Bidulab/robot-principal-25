@@ -56,12 +56,13 @@ Servo servo5;
 float speed, spin;
 const float rotation = .8;
 double angle;
-float moteurA;
-float moteurB;
-float moteurC;
-float moteurD;
+float moteur1 = 0.0;
+float moteur2 = 0.0;
+float moteur3 = 0.0;
+float moteur4 = 0.0;
 
 void config_2209(TMC2209 stepper_driver);
+void updateMotorSpeed(float* current, float target, TMC2209& stepper);
 
 void setup() {
   delay(1000);
@@ -101,25 +102,32 @@ void setup() {
 }
 
 void loop() {
-  myRemote.updateValues();
+  if (!myRemote.updateValues()){
+    // Stop the motors if we lots communication with the remote
+    updateMotorSpeed(&moteur1, 0.0, main_driver_1); //Avant Gauche
+    updateMotorSpeed(&moteur2, 0.0, main_driver_2); //Avant Droit
+    updateMotorSpeed(&moteur3, 0.0, main_driver_3); //Derriere Gauche
+    updateMotorSpeed(&moteur4, 0.0, main_driver_4); //Derriere Droit
+    return;
+  }
 
   speed = constrain(sqrtf((float)myRemote.Joystick1_Y * (float)myRemote.Joystick1_Y + (long)myRemote.Joystick1_X * (float)myRemote.Joystick1_X), 0, 255);
   angle = atan2(myRemote.Joystick1_Y, myRemote.Joystick1_X); //Angle of the joystick
   spin = rotation * myRemote.Joystick2_X;
 
-  moteurA = speed * cos(1.0  * PI/4.0 - angle) + spin; //Avant Gauche
-  moteurB = speed * cos(-1.0 * PI/4.0 - angle) + spin; //Avant Droit
-  moteurC = speed * cos(3.0  * PI/4.0 - angle) + spin; //Derriere Gauche
-  moteurD = speed * cos(-3.0 * PI/4.0 - angle) + spin; //Derriere Droit
+  float moteur1_target = speed * cos(-3.0 * PI/4.0 - angle) + spin; //Derriere Droit
+  float moteur2_target = speed * cos(-1.0 * PI/4.0 - angle) + spin; //Avant Droit
+  float moteur3_target = speed * cos(3.0  * PI/4.0 - angle) + spin; //Derriere Gauche
+  float moteur4_target = speed * cos(1.0  * PI/4.0 - angle) + spin; //Avant Gauche
 
   // driver1 = moteurD
   // driver2 = moteurB
   // driver3 = moteurC
   // driver4 = moteurA
-  main_driver_1.moveAtVelocity((int32_t)(moteurD * 900)); // Derriere Droit
-  main_driver_2.moveAtVelocity((int32_t)(moteurB * 900)); // Avant Droit
-  main_driver_3.moveAtVelocity((int32_t)(moteurC * 900)); // Derriere Gauche
-  main_driver_4.moveAtVelocity((int32_t)(moteurA * 900)); // Avant Gauche
+  updateMotorSpeed(&moteur1, moteur1_target, main_driver_1); //Avant Gauche
+  updateMotorSpeed(&moteur2, moteur2_target, main_driver_2); //Avant Droit
+  updateMotorSpeed(&moteur3, moteur3_target, main_driver_3); //Derriere Gauche
+  updateMotorSpeed(&moteur4, moteur4_target, main_driver_4); //Derriere Droit
 
   if (myRemote.Button1){
     clamp_driver.moveAtVelocity(200000);
@@ -154,4 +162,18 @@ void config_2209(TMC2209 stepper_driver){
   stepper_driver.enable();
   stepper_driver.setMicrostepsPerStepPowerOfTwo(8);
   stepper_driver.enableStealthChop();
+}
+
+void updateMotorSpeed(float* current, float target, TMC2209& stepper) {
+  const float acceleration = 10.0;
+  if (target == 0.0){
+    *current = 0.0;
+  } else if (*current < target) {
+    *current += acceleration;
+    if (*current > target) *current = target; // Avoid overshoot
+  } else if (*current > target) {
+    *current -= acceleration;
+    if (*current < target) *current = target; // Avoid undershoot
+  }
+  stepper.moveAtVelocity((int32_t)((*current) * 900));
 }
