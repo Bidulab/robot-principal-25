@@ -60,6 +60,7 @@ float moteur1 = 0.0;
 float moteur2 = 0.0;
 float moteur3 = 0.0;
 float moteur4 = 0.0;
+float moteurClamp = 0.0;
 
 void config_2209(TMC2209 stepper_driver);
 void updateMotorSpeed(float* current, float target, TMC2209& stepper);
@@ -91,14 +92,16 @@ void setup() {
   
   display.setBrightness(5); // Set the brightness level (0 to 7)
 
-  servo1.attach(68); //68
-  servo2.attach(67); //67
+  servo1.attach(6); //68
+  servo2.attach(7); //67
   servo3.attach(66); //66
   servo4.attach(65); //65
   servo5.attach(64); //64
 
   // Give time to the remote to start
   delay(1000);
+
+  fermer_pinces_complet();
 }
 
 void loop() {
@@ -112,8 +115,12 @@ void loop() {
   }
 
   speed = constrain(sqrtf((float)myRemote.Joystick1_Y * (float)myRemote.Joystick1_Y + (long)myRemote.Joystick1_X * (float)myRemote.Joystick1_X), 0, 255);
+  if (speed < 50)
+    speed = 0;
   angle = atan2(myRemote.Joystick1_Y, myRemote.Joystick1_X); //Angle of the joystick
   spin = rotation * myRemote.Joystick2_X;
+  if (abs(myRemote.Joystick2_X) < 50)
+    spin = 0;
 
   float moteur1_target = speed * cos(-3.0 * PI/4.0 - angle) + spin; //Derriere Droit
   float moteur2_target = speed * cos(-1.0 * PI/4.0 - angle) + spin; //Avant Droit
@@ -130,12 +137,20 @@ void loop() {
   updateMotorSpeed(&moteur4, moteur4_target, main_driver_4); //Derriere Droit
 
   if (myRemote.Button1){
-    clamp_driver.moveAtVelocity(200000);
+    updateMotorSpeed(&moteurClamp, 255, clamp_driver); //Derriere Droit
   } else if (myRemote.Button2){
-    clamp_driver.moveAtVelocity(-200000);
+    updateMotorSpeed(&moteurClamp, -255, clamp_driver); //Derriere Droit
   } else {
     clamp_driver.moveAtVelocity(0);
+    updateMotorSpeed(&moteurClamp, 0.0, clamp_driver); //Derriere Droit
   }
+
+  if (myRemote.Button4){
+    fermer_pinces();
+  } else if (myRemote.Button3){
+    ouvrir_pinces();
+  }
+
 /*
   Serial.print("Joystick1_Y: ");
   Serial.println(myRemote.Joystick1_Y);
@@ -160,12 +175,14 @@ void config_2209(TMC2209 stepper_driver){
   stepper_driver.enableAutomaticCurrentScaling();
   stepper_driver.enableCoolStep();
   stepper_driver.enable();
-  stepper_driver.setMicrostepsPerStepPowerOfTwo(8);
-  stepper_driver.enableStealthChop();
+  stepper_driver.setMicrostepsPerStepPowerOfTwo(6);
+  //stepper_driver.enableStealthChop();¸
+  stepper_driver.disableStealthChop();
+  stepper_driver.setStandstillMode(1); //Freewheel
 }
 
 void updateMotorSpeed(float* current, float target, TMC2209& stepper) {
-  const float acceleration = 10.0;
+  const float acceleration = 15.0;
   if (target == 0.0){
     *current = 0.0;
   } else if (*current < target) {
@@ -175,5 +192,22 @@ void updateMotorSpeed(float* current, float target, TMC2209& stepper) {
     *current -= acceleration;
     if (*current < target) *current = target; // Avoid undershoot
   }
-  stepper.moveAtVelocity((int32_t)((*current) * 900));
+  stepper.moveAtVelocity((int32_t)((*current) * 600 / 4));
+}
+
+void fermer_pinces(){
+  servo1.write(90);
+  servo2.write(90);
+}
+
+void ouvrir_pinces(){
+  const int angle = 30;
+  servo1.write(90 - angle);
+  servo2.write(90 + angle);
+}
+
+void fermer_pinces_complet(){
+  const int angle = -37;
+  servo1.write(90 - angle);
+  servo2.write(90 + angle);
 }
