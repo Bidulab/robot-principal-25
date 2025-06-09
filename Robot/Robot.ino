@@ -136,9 +136,9 @@ void loop() {
   stepper_4.spin(moteur4_target * 10.0);
 
   if (myRemote.Button1){
-    updateMotorSpeed(&moteurClamp, 255, clamp_driver);
+    updateMotorSpeed(&moteurClamp, 200, clamp_driver);
   } else if (myRemote.Button2){
-    updateMotorSpeed(&moteurClamp, -255, clamp_driver);
+    updateMotorSpeed(&moteurClamp, -200, clamp_driver);
   } else {
     updateMotorSpeed(&moteurClamp, 0.0, clamp_driver);
   }

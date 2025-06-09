@@ -35,8 +35,10 @@ public:
         }
         digitalWrite(dirPin, speed >= 0 ? HIGH : LOW);
         stepInterval = 1000000 / (int)(abs(speed)); // Adjust step interval based on speed
-        lastStepTime = micros(); // Reset last step time
-        en = true;
+        if (!en){
+          lastStepTime = micros(); // Reset last step time
+          en = true;
+        }
     }
 
     void loop(){
@@ -46,7 +48,6 @@ public:
             lastStepTime += stepInterval;
             digitalWrite(stepPin, LOW);
         }
-        lastStepTime = micros();
     }
 };
 
