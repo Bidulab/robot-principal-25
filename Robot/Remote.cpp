@@ -9,20 +9,25 @@ Remote::Remote(unsigned long baud, short int initCounter)
   REMOTE_SERIAL.begin(baud);
   counter = initCounter;
 }
-
+static unsigned long i = 0;
+static bool waiting = false;
 // Returns true if valid
 bool Remote::updateValues()
 {
-  REMOTE_SERIAL.flush();      // Clear incomming message
-  REMOTE_SERIAL.write('A');                               // Send get message
-  unsigned short i = 0;
-  while(REMOTE_SERIAL.available() < 13){
-    i++;
-    delayMicroseconds(50);
-    if (i == 400){                                  // If delay > 20 ms
-      return false;
-    }
+  if (!waiting)
+  {
+    REMOTE_SERIAL.flush();      // Clear incomming message
+    REMOTE_SERIAL.write('A');   // Send get message
+    waiting = true;
   }
+  
+  if (REMOTE_SERIAL.available() < 13){
+    i++;
+    if (i == 40000)
+      waiting = false;
+    return false;
+  }
+  waiting = false;
 
   // read the incoming bytes
   REMOTE_SERIAL.readBytes(Mymessage, 13);
@@ -49,5 +54,6 @@ bool Remote::updateValues()
   
   REMOTE_SERIAL.flush();
 
+  
   return true;
 }
