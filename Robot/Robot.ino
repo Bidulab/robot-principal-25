@@ -108,7 +108,7 @@ void loop() {
   //stepper_it();
   if (myRemote.updateValues()){
 
-  speed = constrain(sqrtf((float)myRemote.Joystick1_Y * (float)myRemote.Joystick1_Y + (long)myRemote.Joystick1_X * (float)myRemote.Joystick1_X), 0, 255);
+  speed = constrain(sqrtf((float)myRemote.Joystick1_Y * (float)myRemote.Joystick1_Y + (float)myRemote.Joystick1_X * (float)myRemote.Joystick1_X), 0, 255);
   if (speed < 50)
     speed = 0;
   else
@@ -125,10 +125,10 @@ void loop() {
   }
   spin *= rotation;
 
-  float moteur1_target = speed * cos(-3.0 * PI/4.0 - angle) + spin; //Derriere Droit
-  float moteur2_target = speed * cos(-1.0 * PI/4.0 - angle) + spin; //Avant Droit
-  float moteur3_target = speed * cos(3.0  * PI/4.0 - angle) + spin; //Derriere Gauche
-  float moteur4_target = speed * cos(1.0  * PI/4.0 - angle) + spin; //Avant Gauche
+  float moteur1_target = speed * -cos(angle) + spin; //Derriere
+  float moteur2_target = speed * -sin(angle) + spin; //Droite
+  float moteur3_target = speed *  sin(angle) + spin; //Gauche
+  float moteur4_target = speed *  cos(angle) + spin; //Avant
 
   stepper_1.spin(moteur1_target * 10.0);
   stepper_2.spin(moteur2_target * 10.0);
