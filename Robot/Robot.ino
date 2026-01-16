@@ -38,13 +38,10 @@
 
 Remote myRemote(9600, 30);
 
-HardwareSerial & clamp_driver_sstream = CLAMP_DRIVER_SERIAL;
-
 MyStepper stepper_1;
 MyStepper stepper_2;
 MyStepper stepper_3;
 MyStepper stepper_4;
-TMC2209 clamp_driver;
 
 TM1637Display display(TM1637_CLK_PIN, TM1637_DIO_PIN);
 
@@ -55,9 +52,6 @@ float speed, spin;
 const float rotation = .8;
 double angle;
 float moteurClamp = 0.0;
-
-void config_2209(TMC2209& stepper_driver);
-void updateMotorSpeed(float* current, float target, TMC2209& stepper);
 
 void stepper_it(){
   stepper_1.loop();
@@ -93,10 +87,6 @@ void setup() {
   stepper_3.spin(0.0);
   stepper_4.spin(0.0);
 
-
-  clamp_driver.setup(clamp_driver_sstream, 115200, TMC2209::SERIAL_ADDRESS_0);
-  config_2209(clamp_driver);
-
   // Give time to the remote to start
   delay(200);
 
@@ -108,40 +98,41 @@ void loop() {
   //stepper_it();
   if (myRemote.updateValues()){
 
-  speed = constrain(sqrtf((float)myRemote.Joystick1_Y * (float)myRemote.Joystick1_Y + (float)myRemote.Joystick1_X * (float)myRemote.Joystick1_X), 0, 255);
-  if (speed < 50)
-    speed = 0;
-  else
-   speed -= 50;
-  angle = atan2(myRemote.Joystick1_Y, myRemote.Joystick1_X); //Angle of the joystick
-  spin = myRemote.Joystick2_X;
-  if (abs(myRemote.Joystick2_X) < 50)
+  float xVal = (float)myRemote.Joystick1_X;
+  float yVal = (float)myRemote.Joystick1_Y;
+  float aVal = (float)myRemote.Joystick2_X;
+  
+  spin = aVal;
+  if (abs(aVal) < 50)
     spin = 0;
   else{
-    if (myRemote.Joystick2_X > 0)
+    if (aVal > 0)
       spin -= 50;
     else
       spin += 50;
   }
   spin *= rotation;
 
-  float moteur1_target = speed * -cos(angle) + spin; //Derriere
-  float moteur2_target = speed * -sin(angle) + spin; //Droite
-  float moteur3_target = speed *  sin(angle) + spin; //Gauche
-  float moteur4_target = speed *  cos(angle) + spin; //Avant
-
-  stepper_1.spin(moteur1_target * 10.0);
-  stepper_2.spin(moteur2_target * 10.0);
-  stepper_3.spin(moteur3_target * 10.0);
-  stepper_4.spin(moteur4_target * 10.0);
-
-  if (myRemote.Button1){
-    updateMotorSpeed(&moteurClamp, 200, clamp_driver);
-  } else if (myRemote.Button2){
-    updateMotorSpeed(&moteurClamp, -200, clamp_driver);
-  } else {
-    updateMotorSpeed(&moteurClamp, 0.0, clamp_driver);
+  float moteur1_target = spin; //Derriere
+  float moteur2_target = spin; //Droite
+  float moteur3_target = spin; //Gauche
+  float moteur4_target = spin; //Avant
+  if (abs(xVal) > 50 || abs(yVal) > 50){
+    if (abs(xVal) < abs(yVal)){
+      // Avant Arriere
+      moteur2_target -= yVal;
+      moteur3_target += yVal;
+    } else {
+      // Gauche Droite
+      moteur1_target -= xVal;
+      moteur4_target += xVal;    
+    }
   }
+
+  stepper_1.spin(moteur1_target * 8.0);
+  stepper_2.spin(moteur2_target * 8.0);
+  stepper_3.spin(moteur3_target * 8.0);
+  stepper_4.spin(moteur4_target * 8.0);
 
   if (myRemote.Button4){
     fermer_pinces();
@@ -149,44 +140,10 @@ void loop() {
     ouvrir_pinces();
   }
 
-
-
   display.showNumberDec(myRemote.counter);
   digitalWrite(LED, myRemote.Button1 || myRemote.Button2 || myRemote.Button3 || myRemote.Button4 || myRemote.Joystick1_SW || myRemote.Joystick2_SW);
 
   }
-}
-
-void config_2209(TMC2209& stepper_driver){
-  delay(10);
-  //stepper_driver.setRMSCurrent(1000, R_SENSE);
-  stepper_driver.setRunCurrent(100);
-  delay(10);
-  //stepper_driver.useInternalSenseResistors();
-  stepper_driver.useExternalSenseResistors();
-  //stepper_driver.enableAutomaticCurrentScaling();
-  stepper_driver.enableCoolStep();
-  stepper_driver.setMicrostepsPerStepPowerOfTwo(6);
-  delay(10);
-  //stepper_driver.enableStealthChop();¸
-  //stepper_driver.disableStealthChop();
-  //stepper_driver.setStandstillMode(1); //Freewheel
-  delay(10);
-  stepper_driver.enable();
-}
-
-void updateMotorSpeed(float* current, float target, TMC2209& stepper) {
-  const float acceleration = 15.0;
-  if (target == 0.0){
-    *current = 0.0;
-  } else if (*current < target) {
-    *current += acceleration;
-    if (*current > target) *current = target; // Avoid overshoot
-  } else if (*current > target) {
-    *current -= acceleration;
-    if (*current < target) *current = target; // Avoid undershoot
-  }
-  stepper.moveAtVelocity((int32_t)((*current) * 160));
 }
 
 void fermer_pinces(){
