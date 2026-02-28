@@ -172,31 +172,31 @@ void loop() {
     servo_closing = true;
   }
   if (!servo_closing){
-    if (myRemote.Button1 && !servo1_oppenning){
+    if (myRemote.Button2 && !servo1_oppenning){
       servo1.write(angle_open);
       servo1_oppenning = true;
-    } else if (!myRemote.Button1 && servo1_oppenning){
+    } else if (!myRemote.Button2 && servo1_oppenning){
       servo1_closed = false;
       servo1_oppenning = false;
     }
-    if (myRemote.Button2 && !servo2_oppenning){
+    if (myRemote.Button1 && !servo2_oppenning){
       servo2.write(angle_closed);
       servo2_oppenning = true;
-    } else if (!myRemote.Button2 && servo2_oppenning){
+    } else if (!myRemote.Button1 && servo2_oppenning){
       servo2_closed = false;
       servo2_oppenning = false;
     }
-    if (myRemote.Button3 && !servo3_oppenning){
+    if (myRemote.Button4 && !servo3_oppenning){
       servo3.write(angle_open);
       servo3_oppenning = true;
-    } else if (!myRemote.Button3 && servo3_oppenning){
+    } else if (!myRemote.Button4 && servo3_oppenning){
       servo3_closed = false;
       servo3_oppenning = false;
     }
-    if (myRemote.Button4 && !servo4_oppenning){
+    if (myRemote.Button3 && !servo4_oppenning){
       servo4.write(angle_closed);
       servo4_oppenning = true;
-    } else if (!myRemote.Button4 && servo4_oppenning){
+    } else if (!myRemote.Button3 && servo4_oppenning){
       servo4_closed = false;
       servo4_oppenning = false;
     }    
