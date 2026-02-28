@@ -16,15 +16,19 @@ bool Remote::updateValues()
 {
   if (!waiting)
   {
-    REMOTE_SERIAL.flush();      // Clear incomming message
+    while (REMOTE_SERIAL.available() > 0)
+      REMOTE_SERIAL.read();
     REMOTE_SERIAL.write('A');   // Send get message
     waiting = true;
+    i = 0;
   }
   
   if (REMOTE_SERIAL.available() < 13){
     i++;
-    if (i == 40000)
+    if (i >= 40000){
       waiting = false;
+      i = 0;      
+    }
     return false;
   }
   waiting = false;
