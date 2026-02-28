@@ -56,15 +56,15 @@ double angle;
 float moteurClamp = 0.0;
 const int angle_open = 140;
 const int angle_closed = 10;
-bool servo_closing = false;
+bool btt1_pressed = false;
+bool btt2_pressed = false;
+bool btt3_pressed = false;
+bool btt4_pressed = false;
+
 bool servo1_closed = false;
 bool servo2_closed = false;
 bool servo3_closed = false;
 bool servo4_closed = false;
-bool servo1_oppenning = false;
-bool servo2_oppenning = false;
-bool servo3_oppenning = false;
-bool servo4_oppenning = false;
 
 void stepper_it(){
   stepper_1.loop();
@@ -167,44 +167,38 @@ void loop() {
   stepper_3.spin(moteur3_target * 8.0);
   stepper_4.spin(moteur4_target * 8.0);
 
-  if ((!servo1_closed && !servo2_closed && !servo3_closed && !servo4_closed) && (myRemote.Button1 || myRemote.Button2 || myRemote.Button3 || myRemote.Button4)){
-    fermer_pinces();
-    servo_closing = true;
-  }
-  if (!servo_closing){
-    if (myRemote.Button2 && !servo1_oppenning){
+  if (myRemote.Button2 && !btt2_pressed){ //Rising edge
+    if (servo1_closed)
       servo1.write(angle_open);
-      servo1_oppenning = true;
-    } else if (!myRemote.Button2 && servo1_oppenning){
-      servo1_closed = false;
-      servo1_oppenning = false;
-    }
-    if (myRemote.Button1 && !servo2_oppenning){
+    else
+      servo1.write(angle_closed);  
+    servo1_closed = !servo1_closed;
+  }
+  if (myRemote.Button1 && !btt1_pressed){ //Rising edge
+    if (servo2_closed)
       servo2.write(angle_closed);
-      servo2_oppenning = true;
-    } else if (!myRemote.Button1 && servo2_oppenning){
-      servo2_closed = false;
-      servo2_oppenning = false;
-    }
-    if (myRemote.Button4 && !servo3_oppenning){
+    else
+      servo2.write(angle_open);  
+    servo2_closed = !servo2_closed;
+  }
+  if (myRemote.Button4 && !btt4_pressed){ //Rising edge
+    if (servo3_closed)
       servo3.write(angle_open);
-      servo3_oppenning = true;
-    } else if (!myRemote.Button4 && servo3_oppenning){
-      servo3_closed = false;
-      servo3_oppenning = false;
-    }
-    if (myRemote.Button3 && !servo4_oppenning){
+    else
+      servo3.write(angle_closed);  
+    servo3_closed = !servo3_closed;
+  }
+  if (myRemote.Button3 && !btt3_pressed){ //Rising edge
+    if (servo4_closed)
       servo4.write(angle_closed);
-      servo4_oppenning = true;
-    } else if (!myRemote.Button3 && servo4_oppenning){
-      servo4_closed = false;
-      servo4_oppenning = false;
-    }    
+    else
+      servo4.write(angle_open);  
+    servo4_closed = !servo4_closed;
   }
-  else if (!(myRemote.Button1 || myRemote.Button2 || myRemote.Button3 || myRemote.Button4)){
-    servo_closing = false;
-  }
-  
+  btt1_pressed = myRemote.Button1;
+  btt2_pressed = myRemote.Button2;
+  btt3_pressed = myRemote.Button3;
+  btt4_pressed = myRemote.Button4;
 
   //display.showNumberDec(myRemote.counter);
   digitalWrite(LED, myRemote.Button1 || myRemote.Button2 || myRemote.Button3 || myRemote.Button4 || myRemote.Joystick1_SW || myRemote.Joystick2_SW);
