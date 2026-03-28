@@ -4,16 +4,11 @@
 //#include <Wire.h>
 
 #include "Remote.h"
-#include <TM1637Display.h>
 #include <TMC2209.h>
 #include "MyStepper.h"
 #include <TimerThree.h>
 
 #define LED 13
-
-// Define the pins for TM1637 module
-#define TM1637_CLK_PIN 23
-#define TM1637_DIO_PIN 22
 
 #define MAIN_DRIVERS_SERIAL Serial1
 #define CLAMP_DRIVER_SERIAL Serial2
@@ -42,8 +37,6 @@ MyStepper stepper_1;
 MyStepper stepper_2;
 MyStepper stepper_3;
 MyStepper stepper_4;
-
-TM1637Display display(TM1637_CLK_PIN, TM1637_DIO_PIN);
 
 Servo servo1;
 Servo servo2;
@@ -84,8 +77,6 @@ void setup() {
 
   pinMode(LED, OUTPUT);
  // Serial.begin(115200); //Computer communication
-
-  display.setBrightness(5); // Set the brightness level (0 to 7)
 
   servo1.attach(6); //68
   servo2.attach(7); //67
@@ -207,7 +198,6 @@ void loop() {
   }
   encoder_sw_pressed = myRemote.Encoder_SW;
 
-  //display.showNumberDec(myRemote.counter);
   digitalWrite(LED, myRemote.Button1 || myRemote.Button2 || myRemote.Button3 || myRemote.Button4 || myRemote.Joystick1_SW || myRemote.Joystick2_SW);
 
   }
