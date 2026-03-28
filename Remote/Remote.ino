@@ -22,7 +22,6 @@ signed char deltaEncoder = 0;
 bool etatA;
 bool dernierEtatA;
 unsigned long tempsA;
-bool dernierEtatSW = false;
 unsigned long lastMessage = 0;
 
 void setup() {
@@ -46,7 +45,6 @@ void setup() {
 
   // état de A au setup
   dernierEtatA = digitalRead(R_ENCODER_CLK);
-  dernierEtatSW = digitalRead(R_ENCODER_SW);
   deltaEncoder = 0;
   // memorisation du temps pour eviter des erreurs de changements d'etat
   tempsA = millis();
@@ -61,13 +59,6 @@ void loop() {
   else
     digitalWrite(LED, HIGH);
 
-  if (!dernierEtatSW && digitalRead(R_ENCODER_SW)){
-    deltaEncoder += 10;
-    dernierEtatSW = true;
-  }
-  else if (dernierEtatSW && !digitalRead(R_ENCODER_SW))
-    dernierEtatSW = false;
-  
   char val[1]; //Used to store the incomming message from robot
   val[0] = 0;
   if (Serial.available() > 0)
@@ -86,7 +77,7 @@ void loop() {
       myMessage[8] = digitalRead(BUTTON4);
       myMessage[9] = digitalRead(JOYSTICK1_SW);
       myMessage[10] = digitalRead(JOYSTICK2_SW);
-      myMessage[11] = deltaEncoder;
+      myMessage[11] = digitalRead(R_ENCODER_SW);
       myMessage[12] = 0x55;
       deltaEncoder = 0;
 

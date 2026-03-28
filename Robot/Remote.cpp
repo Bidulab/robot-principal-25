@@ -53,8 +53,8 @@ bool Remote::updateValues()
 
   Joystick1_SW = !Mymessage[9]; 
   Joystick2_SW = !Mymessage[10];
-  
-  //counter += (signed char)Mymessage[11];
+
+  Encoder_SW = !Mymessage[11];
   
   REMOTE_SERIAL.flush();
 

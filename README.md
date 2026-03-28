@@ -30,7 +30,7 @@ Le programme gère :
 
 ## Fonctionnalités
 1. **Entrées des joysticks :** Capture des valeurs analogiques pour les axes X et Y et des états numériques pour les boutons-poussoirs.
-2. **Encodeur rotatif :** Suivi des mouvements relatifs (delta) et de l'état du bouton.
+2. **Encodeur rotatif :** Lecture de l'état du bouton-poussoir.
 3. **État des boutons :** Lecture de l'état des quatre boutons supplémentaires.
 4. **Indicateur LED :** Clignote si aucune communication valide n'est reçue dans un délai de 200 ms ; reste allumée sinon.
 5. **Protocole personnalisé :** Un protocole léger pour transmettre les états des entrées.
@@ -59,7 +59,7 @@ Chaque message comporte 13 octets et suit ce format :
 | 8     | État du bouton 4              | `0` ou `1`            |
 | 9     | État du bouton du joystick 1  | `0` ou `1`            |
 | 10    | État du bouton du joystick 2  | `0` ou `1`            |
-| 11    | Delta de l'encodeur rotatif   | Valeur signée         |
+| 11    | État du bouton de l'encodeur  | `0` ou `1`            |
 | 12    | Octet de fin                  | `0x55`                |
 
 ---

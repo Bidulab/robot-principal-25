@@ -61,6 +61,8 @@ bool btt2_pressed = false;
 bool btt3_pressed = false;
 bool btt4_pressed = false;
 
+bool encoder_sw_pressed = false;
+
 bool servo1_closed = false;
 bool servo2_closed = false;
 bool servo3_closed = false;
@@ -199,6 +201,11 @@ void loop() {
   btt2_pressed = myRemote.Button2;
   btt3_pressed = myRemote.Button3;
   btt4_pressed = myRemote.Button4;
+
+  if (myRemote.Encoder_SW && !encoder_sw_pressed){ //Rising edge
+    ouvrir_pinces();
+  }
+  encoder_sw_pressed = myRemote.Encoder_SW;
 
   //display.showNumberDec(myRemote.counter);
   digitalWrite(LED, myRemote.Button1 || myRemote.Button2 || myRemote.Button3 || myRemote.Button4 || myRemote.Joystick1_SW || myRemote.Joystick2_SW);
