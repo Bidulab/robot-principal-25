@@ -80,7 +80,7 @@ Le programme Arduino envoie des données uniquement lorsqu’il reçoit une comm
 
 ## Description
 
-Ce programme contrôle le robot équipé de moteurs pas à pas, servo-moteurs et un écran TM1637. Le robot est piloté à l'aide de la télécommande.
+Ce programme contrôle le robot équipé de moteurs pas à pas et servo-moteurs. Le robot est piloté à l'aide de la télécommande.
 
 ---
 
