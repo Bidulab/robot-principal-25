@@ -1,5 +1,5 @@
 # robot-principal-25
-Programmation du robot principal de la CDFR 2025 de l'équipe Bidulab.
+Programmation du robot principal de la CDFR 2026 de l'équipe Bidulab.
 
 Vous trouverez les programmes Remote et Robot ainsi que des tests, pour être compilés pour Arduino Nano et Mega.
 
@@ -97,13 +97,8 @@ Ce programme contrôle le robot équipé de moteurs pas à pas, servo-moteurs et
   - `Joystick 1` : contrôle la direction et la vitesse.
   - `Joystick 2` : contrôle la rotation (pivot sur place).
 - **Boutons** :
-  - `Button1` : Monter la pince.
-  - `Button2` : Descendre la pince.
-  - `Button3` : Ouvrir la pince.
-  - `Button4` : Fermer la pince.
+  - `Button1` : Monter ou descendre l'attrape noisette 1
+  - `Button2` : Monter ou descendre l'attrape noisette 2
+  - `Button3` : Monter ou descendre l'attrape noisette 3
+  - `Button4` : Monter ou descendre l'attrape noisette 4
 
-### 3. **Affichage sur TM1637**
-- L'écran affiche le compte des points par l'encodeur rotatif.
-
-### 4. **Servo-moteurs**
-- Le programme contrôle **2 servo-moteurs**, qui sont utilisés pour les estrades.
