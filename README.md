@@ -9,8 +9,6 @@ Programme testé avec Arduino IDE 2.2.1
 ### Remote
 - Aucune dépendance
 ### Robot
-- TM1637 by Avishay Orpaz
-https://github.com/avishorp/TM1637
 - TMC2209 by Peter Polidoro
 https://github.com/janelia-arduino/TMC2209
 
