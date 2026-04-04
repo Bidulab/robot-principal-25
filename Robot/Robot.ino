@@ -49,6 +49,13 @@ double angle;
 float moteurClamp = 0.0;
 const int angle_open = 140;
 const int angle_closed = 10;
+
+const int angle_open_2 = 115;
+const int angle_closed_2 = 10;
+
+const int angle_open_3 = 140;
+const int angle_closed_3 = 40;
+
 bool btt1_pressed = false;
 bool btt2_pressed = false;
 bool btt3_pressed = false;
@@ -169,16 +176,16 @@ void loop() {
   }
   if (myRemote.Button1 && !btt1_pressed){ //Rising edge
     if (servo2_closed)
-      servo2.write(angle_closed);
+      servo2.write(angle_closed_2);
     else
-      servo2.write(angle_open);  
+      servo2.write(angle_open_2);  
     servo2_closed = !servo2_closed;
   }
   if (myRemote.Button4 && !btt4_pressed){ //Rising edge
     if (servo3_closed)
-      servo3.write(angle_open);
+      servo3.write(angle_open_3);
     else
-      servo3.write(angle_closed);  
+      servo3.write(angle_closed_3);  
     servo3_closed = !servo3_closed;
   }
   if (myRemote.Button3 && !btt3_pressed){ //Rising edge
@@ -204,8 +211,8 @@ void loop() {
 }
 void ouvrir_pinces(){
   servo1.write(angle_open);
-  servo2.write(angle_closed);
-  servo3.write(angle_open);
+  servo2.write(angle_closed_2);
+  servo3.write(angle_open_3);
   servo4.write(angle_closed);
   servo1_closed = false;
   servo2_closed = false;
@@ -214,8 +221,8 @@ void ouvrir_pinces(){
 }
 void fermer_pinces(){
   servo1.write(angle_closed);
-  servo2.write(angle_open);
-  servo3.write(angle_closed);
+  servo2.write(angle_open_2);
+  servo3.write(angle_closed_3);
   servo4.write(angle_open);  
   servo1_closed = true;
   servo2_closed = true;
