@@ -4,16 +4,11 @@
 //#include <Wire.h>
 
 #include "Remote.h"
-#include <TM1637Display.h>
 #include <TMC2209.h>
 #include "MyStepper.h"
 #include <TimerThree.h>
 
 #define LED 13
-
-// Define the pins for TM1637 module
-#define TM1637_CLK_PIN 23
-#define TM1637_DIO_PIN 22
 
 #define MAIN_DRIVERS_SERIAL Serial1
 #define CLAMP_DRIVER_SERIAL Serial2
@@ -43,8 +38,6 @@ MyStepper stepper_2;
 MyStepper stepper_3;
 MyStepper stepper_4;
 
-TM1637Display display(TM1637_CLK_PIN, TM1637_DIO_PIN);
-
 Servo servo1;
 Servo servo2;
 Servo servo3;
@@ -56,10 +49,19 @@ double angle;
 float moteurClamp = 0.0;
 const int angle_open = 140;
 const int angle_closed = 10;
+
+const int angle_open_2 = 115;
+const int angle_closed_2 = 10;
+
+const int angle_open_3 = 140;
+const int angle_closed_3 = 40;
+
 bool btt1_pressed = false;
 bool btt2_pressed = false;
 bool btt3_pressed = false;
 bool btt4_pressed = false;
+
+bool encoder_sw_pressed = false;
 
 bool servo1_closed = false;
 bool servo2_closed = false;
@@ -82,8 +84,6 @@ void setup() {
 
   pinMode(LED, OUTPUT);
  // Serial.begin(115200); //Computer communication
-
-  display.setBrightness(5); // Set the brightness level (0 to 7)
 
   servo1.attach(6); //68
   servo2.attach(7); //67
@@ -176,16 +176,16 @@ void loop() {
   }
   if (myRemote.Button1 && !btt1_pressed){ //Rising edge
     if (servo2_closed)
-      servo2.write(angle_closed);
+      servo2.write(angle_closed_2);
     else
-      servo2.write(angle_open);  
+      servo2.write(angle_open_2);  
     servo2_closed = !servo2_closed;
   }
   if (myRemote.Button4 && !btt4_pressed){ //Rising edge
     if (servo3_closed)
-      servo3.write(angle_open);
+      servo3.write(angle_open_3);
     else
-      servo3.write(angle_closed);  
+      servo3.write(angle_closed_3);  
     servo3_closed = !servo3_closed;
   }
   if (myRemote.Button3 && !btt3_pressed){ //Rising edge
@@ -200,15 +200,19 @@ void loop() {
   btt3_pressed = myRemote.Button3;
   btt4_pressed = myRemote.Button4;
 
-  //display.showNumberDec(myRemote.counter);
+  if (myRemote.Encoder_SW && !encoder_sw_pressed){ //Rising edge
+    ouvrir_pinces();
+  }
+  encoder_sw_pressed = myRemote.Encoder_SW;
+
   digitalWrite(LED, myRemote.Button1 || myRemote.Button2 || myRemote.Button3 || myRemote.Button4 || myRemote.Joystick1_SW || myRemote.Joystick2_SW);
 
   }
 }
 void ouvrir_pinces(){
   servo1.write(angle_open);
-  servo2.write(angle_closed);
-  servo3.write(angle_open);
+  servo2.write(angle_closed_2);
+  servo3.write(angle_open_3);
   servo4.write(angle_closed);
   servo1_closed = false;
   servo2_closed = false;
@@ -217,8 +221,8 @@ void ouvrir_pinces(){
 }
 void fermer_pinces(){
   servo1.write(angle_closed);
-  servo2.write(angle_open);
-  servo3.write(angle_closed);
+  servo2.write(angle_open_2);
+  servo3.write(angle_closed_3);
   servo4.write(angle_open);  
   servo1_closed = true;
   servo2_closed = true;

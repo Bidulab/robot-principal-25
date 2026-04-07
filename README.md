@@ -1,5 +1,5 @@
 # robot-principal-25
-Programmation du robot principal de la CDFR 2025 de l'équipe Bidulab.
+Programmation du robot principal de la CDFR 2026 de l'équipe Bidulab.
 
 Vous trouverez les programmes Remote et Robot ainsi que des tests, pour être compilés pour Arduino Nano et Mega.
 
@@ -9,8 +9,6 @@ Programme testé avec Arduino IDE 2.2.1
 ### Remote
 - Aucune dépendance
 ### Robot
-- TM1637 by Avishay Orpaz
-https://github.com/avishorp/TM1637
 - TMC2209 by Peter Polidoro
 https://github.com/janelia-arduino/TMC2209
 
@@ -30,7 +28,7 @@ Le programme gère :
 
 ## Fonctionnalités
 1. **Entrées des joysticks :** Capture des valeurs analogiques pour les axes X et Y et des états numériques pour les boutons-poussoirs.
-2. **Encodeur rotatif :** Suivi des mouvements relatifs (delta) et de l'état du bouton.
+2. **Encodeur rotatif :** Lecture de l'état du bouton-poussoir.
 3. **État des boutons :** Lecture de l'état des quatre boutons supplémentaires.
 4. **Indicateur LED :** Clignote si aucune communication valide n'est reçue dans un délai de 200 ms ; reste allumée sinon.
 5. **Protocole personnalisé :** Un protocole léger pour transmettre les états des entrées.
@@ -59,7 +57,7 @@ Chaque message comporte 13 octets et suit ce format :
 | 8     | État du bouton 4              | `0` ou `1`            |
 | 9     | État du bouton du joystick 1  | `0` ou `1`            |
 | 10    | État du bouton du joystick 2  | `0` ou `1`            |
-| 11    | Delta de l'encodeur rotatif   | Valeur signée         |
+| 11    | État du bouton de l'encodeur  | `0` ou `1`            |
 | 12    | Octet de fin                  | `0x55`                |
 
 ---
@@ -80,7 +78,7 @@ Le programme Arduino envoie des données uniquement lorsqu’il reçoit une comm
 
 ## Description
 
-Ce programme contrôle le robot équipé de moteurs pas à pas, servo-moteurs et un écran TM1637. Le robot est piloté à l'aide de la télécommande.
+Ce programme contrôle le robot équipé de moteurs pas à pas et servo-moteurs. Le robot est piloté à l'aide de la télécommande.
 
 ---
 
@@ -97,13 +95,8 @@ Ce programme contrôle le robot équipé de moteurs pas à pas, servo-moteurs et
   - `Joystick 1` : contrôle la direction et la vitesse.
   - `Joystick 2` : contrôle la rotation (pivot sur place).
 - **Boutons** :
-  - `Button1` : Monter la pince.
-  - `Button2` : Descendre la pince.
-  - `Button3` : Ouvrir la pince.
-  - `Button4` : Fermer la pince.
+  - `Button1` : Monter ou descendre l'attrape noisette 1
+  - `Button2` : Monter ou descendre l'attrape noisette 2
+  - `Button3` : Monter ou descendre l'attrape noisette 3
+  - `Button4` : Monter ou descendre l'attrape noisette 4
 
-### 3. **Affichage sur TM1637**
-- L'écran affiche le compte des points par l'encodeur rotatif.
-
-### 4. **Servo-moteurs**
-- Le programme contrôle **2 servo-moteurs**, qui sont utilisés pour les estrades.

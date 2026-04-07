@@ -26,6 +26,8 @@ class Remote
     bool Joystick1_SW = false; 
     bool Joystick2_SW = false;
 
+        bool Encoder_SW = false;
+
     short int counter;
 
 		Remote(unsigned long baud, short int initCounter);
