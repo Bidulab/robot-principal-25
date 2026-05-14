@@ -1,7 +1,6 @@
 #include <math.h>
 #include <Servo.h>
 #include <Arduino.h>
-//#include <Wire.h>
 
 #include "Remote.h"
 #include <TMC2209.h>
@@ -86,7 +85,6 @@ void setup() {
   digitalWrite(CLAMP_DRIVER_EN_PIN, LOW);  // Enabled
 
   pinMode(LED, OUTPUT);
-  // Serial.begin(115200); //Computer communication
 
   servo1.attach(6);  //68
   servo2.attach(7);  //67
@@ -114,7 +112,6 @@ void setup() {
 }
 
 void loop() {
-  //stepper_it();
   if (myRemote.updateValues()) {
 
     float xVal = (float)myRemote.Joystick1_X;
